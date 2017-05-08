@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +24,7 @@ public class ChatActivity extends AppCompatActivity {
     ListView listView;
     String session;
     String username;
-    String friend;
+    String friend,sendMsg;
     String text;
     JSONArray jsonArray;
     JSONObject jsonObject;
@@ -39,6 +40,8 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         init();
     }
+
+
 
     private void init(){
         arrayList = new ArrayList<>();
@@ -61,6 +64,14 @@ public class ChatActivity extends AppCompatActivity {
         Retriever_getMsg retriever_getMsg = new Retriever_getMsg();
         retriever_getMsg.execute();
 
+        chatSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMsg = messageEdit.getText().toString();
+                Retriever_posMsg retriever_posMsg = new Retriever_posMsg();
+                retriever_posMsg.execute(sendMsg);
+            }
+        });
 
     }
 
@@ -100,14 +111,39 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                     Log.d("jsonObject",jsonObject.toString());
-
-
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(ChatActivity.this,android.R.layout.simple_list_item_1,arrayList);
             listView.setAdapter(adapter);
+        }
+    }
+
+    private class Retriever_posMsg extends AsyncTask<String,Void,Void>{
+
+
+        @Override
+        protected Void doInBackground(String... params) {
+            HTTPHelper httpHelper = new HTTPHelper();
+            hashMap_posMsg.put("sessionid",session);
+            hashMap_posMsg.put("targetname",friend);
+            hashMap_posMsg.put("message",params[0]);
+            text = httpHelper.POST("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/postMessage",hashMap_posMsg);
+            init();
+
+            try {
+                jsonObject  = new JSONObject(text);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            messageEdit.setText("");
         }
     }
 }
