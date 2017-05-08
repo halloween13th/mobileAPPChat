@@ -143,7 +143,7 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            messageEdit.setText("");
+            messageEdit.setText(null);
         }
     }
 }
