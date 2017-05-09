@@ -1,6 +1,7 @@
 package com.example.snowman.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,12 +51,17 @@ public class ContactActivity extends AppCompatActivity {
         hashMap = new HashMap<>();
         arrayList = new ArrayList<String>();
 
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref",MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        session = pref.getString("session",null);
+        username = pref.getString("username",null);
+
         addButton = (Button)findViewById(R.id.addButton);
         myListView = (ListView)findViewById(R.id.myListView);
 
         Intent intent = getIntent();
-        session = intent.getStringExtra("session");
-        username = intent.getStringExtra("username");
+       // session = intent.getStringExtra("session");
+        //username = intent.getStringExtra("username");
         hashMap.put("sessionid",session);
 
         Retriver retriver = new Retriver();
@@ -88,8 +95,12 @@ public class ContactActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            HTTPHelper httpHelper = new HTTPHelper();
-            text = httpHelper.POST("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/getContact",hashMap);
+            OkHttpHelper httpHelper = new OkHttpHelper();
+            try {
+                text = httpHelper.post("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/getContact",hashMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Log.d("bbb",text);
             try {
                 jsonObject = new JSONObject(text);

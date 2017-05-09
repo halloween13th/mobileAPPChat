@@ -36,6 +36,7 @@
             android:layout_above="@+id/msgEdit"
             android:layout_marginTop="10dp"
             android:transcriptMode="alwaysScroll"
+            android:stackFromBottom="true"
             android:divider="@null">
 
         </ListView>

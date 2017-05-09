@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -74,8 +75,12 @@ public class AddActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            HTTPHelper httpHelper = new HTTPHelper();
-            text = httpHelper.POST("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/searchUser",hashMap_search);
+            OkHttpHelper httpHelper = new OkHttpHelper();
+            try {
+                text = httpHelper.post("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/searchUser",hashMap_search);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             //Log.d("bbb",text);
             try {
                 jsonObject = new JSONObject(text);
@@ -106,8 +111,12 @@ public class AddActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            HTTPHelper httpHelper = new HTTPHelper();
-            text = httpHelper.POST("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/addContact",hashMap_add);
+            OkHttpHelper httpHelper = new OkHttpHelper();
+            try {
+                text = httpHelper.post("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/addContact",hashMap_add);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             try {
                 jsonObject = new JSONObject(text);

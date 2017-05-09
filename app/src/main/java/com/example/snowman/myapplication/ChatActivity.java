@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -53,6 +54,7 @@ public class ChatActivity extends AppCompatActivity {
         friend = intent.getStringExtra("friend");
         jsonArray = new JSONArray();
 
+        getSupportActionBar().setTitle(friend);
         messageEdit = (EditText)findViewById(R.id.msgEdit);
         listView = (ListView)findViewById(R.id.messagesContainer);
         chatSendButton = (Button)findViewById(R.id.chatSendButton);
@@ -70,8 +72,10 @@ public class ChatActivity extends AppCompatActivity {
                 sendMsg = messageEdit.getText().toString();
                 Retriever_posMsg retriever_posMsg = new Retriever_posMsg();
                 retriever_posMsg.execute(sendMsg);
+
             }
         });
+
 
     }
 
@@ -80,12 +84,15 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            HTTPHelper httpHelper = new HTTPHelper();
-            text = httpHelper.POST("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/getMessage",hashMap_getMsg);
+            OkHttpHelper httpHelper = new  OkHttpHelper();
+
 
             try {
+                text = httpHelper.post("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/getMessage",hashMap_getMsg);
                 jsonObject  = new JSONObject(text);
             } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
@@ -98,7 +105,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 jsonArrayChatAll = jsonObject.getJSONArray("content");
 
-                for(int i =  0 ; i < jsonArrayChatAll.length() ;i ++){
+                for(int i =  0 ; i < jsonArrayChatAll.length()  ;i ++){
                     jsonObject = jsonArrayChatAll.getJSONObject(i);
                     String seqno = jsonObject.getString("seqno");
                     String from = jsonObject.getString("from");
@@ -125,11 +132,15 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(String... params) {
-            HTTPHelper httpHelper = new HTTPHelper();
+            OkHttpHelper httpHelper = new OkHttpHelper();
             hashMap_posMsg.put("sessionid",session);
             hashMap_posMsg.put("targetname",friend);
             hashMap_posMsg.put("message",params[0]);
-            text = httpHelper.POST("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/postMessage",hashMap_posMsg);
+            try {
+                text = httpHelper.post("https://mis.cp.eng.chula.ac.th/mobile/service.php?q=api/postMessage",hashMap_posMsg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             init();
 
             try {
@@ -143,7 +154,8 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            messageEdit.setText("");
+            messageEdit.setText(null);
         }
     }
+
 }
